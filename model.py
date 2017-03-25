@@ -1,6 +1,9 @@
 import torch
+import init_funcs as init
 import torch.nn as nn
 from torch.autograd import Variable
+import numpy as np
+
 
 class RNNModel(nn.Module):
     """Container module with an encoder, a recurrent module, and a decoder."""
@@ -16,12 +19,15 @@ class RNNModel(nn.Module):
         self.rnn_type = rnn_type
         self.nhid = nhid
         self.nlayers = nlayers
+    
 
     def init_weights(self):
         initrange = 0.1
-        self.encoder.weight.data.uniform_(-initrange, initrange)
+        init.xavier_uniform(self.encoder.weight, gain=np.sqrt(2.0))
+        init.xavier_uniform(self.decoder.weight, gain=np.sqrt(2.0))
+        #self.encoder.weight.data.uniform_(-initrange, initrange)
         self.decoder.bias.data.fill_(0)
-        self.decoder.weight.data.uniform_(-initrange, initrange)
+        #self.decoder.weight.data.uniform_(-initrange, initrange)
 
     def forward(self, input, hidden):
         emb = self.encoder(input)
