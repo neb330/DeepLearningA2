@@ -1,17 +1,15 @@
 import torch
-import init_funcs as init
 import torch.nn as nn
 from torch.autograd import Variable
-import numpy as np
-
 
 class RNNModel(nn.Module):
     """Container module with an encoder, a recurrent module, and a decoder."""
 
-    def __init__(self, rnn_type, ntoken, ninp, nhid, nlayers):
+    def __init__(self, rnn_type, ntoken, ninp, nhid, nlayers, dropout=0.65):
         super(RNNModel, self).__init__()
         self.encoder = nn.Embedding(ntoken, ninp)
-        self.rnn = getattr(nn, rnn_type)(ninp, nhid, nlayers, bias=False)
+        self.dropout = nn.Dropout(dropout)
+        self.rnn = getattr(nn, rnn_type)(ninp, nhid, nlayers, bias=False, dropout=dropout)
         self.decoder = nn.Linear(nhid, ntoken)
 
         self.init_weights()
@@ -19,21 +17,17 @@ class RNNModel(nn.Module):
         self.rnn_type = rnn_type
         self.nhid = nhid
         self.nlayers = nlayers
-    
 
     def init_weights(self):
         initrange = 0.1
-        #init.kaiming_uniform(self.encoder.weight)
-        #init.kaiming_uniform(self.decoder.weight)
-        init.xavier_uniform(self.encoder.weight, gain=np.sqrt(2.0))
-        init.xavier_uniform(self.decoder.weight, gain=np.sqrt(2.0))
-        #self.encoder.weight.data.uniform_(-initrange, initrange)
+        self.encoder.weight.data.uniform_(-initrange, initrange)
         self.decoder.bias.data.fill_(0)
-        #self.decoder.weight.data.uniform_(-initrange, initrange)
+        self.decoder.weight.data.uniform_(-initrange, initrange)
 
     def forward(self, input, hidden):
-        emb = self.encoder(input)
+        emb = self.dropout(self.encoder(input))
         output, hidden = self.rnn(emb, hidden)
+        output = self.dropout(output)
         decoded = self.decoder(output.view(output.size(0)*output.size(1), output.size(2)))
         return decoded.view(output.size(0), output.size(1), decoded.size(1)), hidden
 
