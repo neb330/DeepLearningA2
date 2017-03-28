@@ -4,10 +4,11 @@ import math
 import torch
 import torch.nn as nn
 from torch.autograd import Variable
+import os
 
 import data
 import data_helpers as dh
-import model_dropout as model
+import model
 
 parser = argparse.ArgumentParser(description='PyTorch PennTreeBank RNN/LSTM Language Model')
 parser.add_argument('--data', type=str, default='./data/penn',
@@ -53,7 +54,7 @@ torch.manual_seed(args.seed)
 # Load data
 ###############################################################################
 
-if args.data == './data/gutenberg':
+if args.data == './data/gutenberg' and not os.path.exists('./data/gutenberg_clean/train.txt'):
     dh.prepare_data(args.data, args.vocabsize)
 
 corpus = data.Corpus(args.data)
@@ -71,6 +72,7 @@ eval_batch_size = 10
 train_data = batchify(corpus.train, args.batch_size)
 val_data = batchify(corpus.valid, eval_batch_size)
 test_data = batchify(corpus.test, eval_batch_size)
+
 
 ###############################################################################
 # Build the model
@@ -162,6 +164,9 @@ lr = args.lr
 prev_val_loss = None
 for epoch in range(1, args.epochs+1):
     epoch_start_time = time.time()
+    if args.shuffle == True:
+        shuffle = torch.randperm(train_data.size(0))
+        train_data = torch.index_select(train_data, 0, shuffle)
     train()
     val_loss = evaluate(val_data)
     print('-' * 89)
