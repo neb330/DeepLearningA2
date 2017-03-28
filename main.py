@@ -4,6 +4,7 @@ import math
 import torch
 import torch.nn as nn
 from torch.autograd import Variable
+import torch.optim as optim
 import os
 
 import data
@@ -15,6 +16,8 @@ parser.add_argument('--data', type=str, default='./data/penn',
                     help='location of the data corpus')
 parser.add_argument('--vocabsize', type=int, default=10000,
                     help='size of vocab -- only applicable when data = gutenberg')
+parser.add_argument('--optimizer', type=str, default=None,
+                    help='options are adam, sgd')
 parser.add_argument('--model', type=str, default='LSTM',
                     help='type of recurrent net (RNN_TANH, RNN_RELU, LSTM, GRU)')
 parser.add_argument('--dropout', type=float, default=1.0,
@@ -134,14 +137,24 @@ def train():
     start_time = time.time()
     ntokens = len(corpus.dictionary)
     hidden = model.init_hidden(args.batch_size)
+    if args.optimizer == 'adam':
+        optimizer = optim.Adam(model.parameters(), lr=0.01)
+    elif args.optimizer == 'sgd':
+        optimizer = optim.SGD(model.parameters(), lr=0.01, momentum = 0.5)
+    else:
+        optimizer = None
     for batch, i in enumerate(range(0, train_data.size(0) - 1, args.bptt)):
+        if optimizer:
+            optimizer.zero_grad()
+        else:
+            model.zero_grad()
         data, targets = get_batch(train_data, i)
         hidden = repackage_hidden(hidden)
-        model.zero_grad()
         output, hidden = model(data, hidden)
         loss = criterion(output.view(-1, ntokens), targets)
         loss.backward()
-
+        if optimizer:
+            optimizer.step()
         clipped_lr = lr * clip_gradient(model, args.clip)
         for p in model.parameters():
             p.data.add_(-clipped_lr, p.grad.data)
