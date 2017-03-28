@@ -6,15 +6,20 @@ import torch.nn as nn
 from torch.autograd import Variable
 
 import data
+import data_helpers as dh
 import model_dropout as model
 
 parser = argparse.ArgumentParser(description='PyTorch PennTreeBank RNN/LSTM Language Model')
 parser.add_argument('--data', type=str, default='./data/penn',
                     help='location of the data corpus')
+parser.add_argument('--vocabsize', type=int, default=10000,
+                    help='size of vocab -- only applicable when data = gutenberg')
 parser.add_argument('--model', type=str, default='LSTM',
                     help='type of recurrent net (RNN_TANH, RNN_RELU, LSTM, GRU)')
 parser.add_argument('--emsize', type=int, default=50,
                     help='size of word embeddings')
+parser.add_argument('--shuffle', type=bool, default=False,
+                    help='type True to shuffle data at each batch')
 parser.add_argument('--nhid', type=int, default=50,
                     help='humber of hidden units per layer')
 parser.add_argument('--nlayers', type=int, default=1,
@@ -46,13 +51,11 @@ torch.manual_seed(args.seed)
 # Load data
 ###############################################################################
 
+if args.data == './data/gutenberg':
+    dh.prepare_data(args.data, args.vocabsize)
+
 corpus = data.Corpus(args.data)
-#args.emsize = 200
-args.nhid = 500
-args.nlayers = 2
-#args.log_interval = 1000
-#args.epochs = 40
-#args.clip = 0.25
+
 
 def batchify(data, bsz):
     nbatch = data.size(0) // bsz
