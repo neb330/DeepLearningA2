@@ -12,6 +12,7 @@ arguments:
   --vocabsize {N}   size of vocabulary to consider (only applicable for gutenberg data)
   --dropout         Dropout factor
   --optimizer       Can be one of {adam, sgd}
+  --shuffle         True or False -- whether or not to shuffle data at the beginning of each epoch
 
 ```
 
