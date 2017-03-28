@@ -5,12 +5,15 @@ NYU course Spring 2017 Assignment 2
 This sample code is from https://github.com/pytorch/examples/tree/master/word_language_model.
 
 
-## How to run on Gutenberg data:
+## Options added for hyperparamter tuning:
+```bash
+arguments:
+  --data {PATH}     can now input './data/gutenberg' to run on Gutenberg dataset
+  --vocabsize {N}   size of vocabulary to consider (only applicable for gutenberg data)
+  --dropout         Dropout factor
+  --optimizer       Can be one of {adam, sgd}
 
-* Run `python main.py --data ./data/gutenberg --vocabsize 10000`.
-
-
-
+```
 
 ## Word-level language modeling RNN
 
