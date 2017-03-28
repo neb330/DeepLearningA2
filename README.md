@@ -4,6 +4,14 @@ NYU course Spring 2017 Assignment 2
 
 This sample code is from https://github.com/pytorch/examples/tree/master/word_language_model.
 
+
+## How to run on Gutenberg data:
+
+* Run `python main.py --data ./data/gutenberg --vocabsize 10000`.
+
+
+
+
 ## Word-level language modeling RNN
 
 This example trains a multi-layer RNN (Elman, GRU, or LSTM) on a language modeling task.
