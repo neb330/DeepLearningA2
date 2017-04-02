@@ -65,7 +65,6 @@ corpus = data.Corpus(args.data)
 
 def batchify(data, bsz):
     nbatch = data.size(0) // bsz
-    print(nbatch)
     data = data.narrow(0, 0, nbatch * bsz)
     data = data.view(bsz, -1).t().contiguous()
     if args.cuda:
