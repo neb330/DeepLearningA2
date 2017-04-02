@@ -57,7 +57,7 @@ torch.manual_seed(args.seed)
 # Load data
 ###############################################################################
 
-if args.data == './data/gutenberg' and not os.path.exists('./data/gutenberg_clean/train.txt'):
+if args.data == './data/gutenberg':
     dh.prepare_data(args.data, args.vocabsize)
 
 corpus = data.Corpus(args.data)
@@ -65,6 +65,7 @@ corpus = data.Corpus(args.data)
 
 def batchify(data, bsz):
     nbatch = data.size(0) // bsz
+    print(nbatch)
     data = data.narrow(0, 0, nbatch * bsz)
     data = data.view(bsz, -1).t().contiguous()
     if args.cuda:
@@ -189,7 +190,7 @@ for epoch in range(1, args.epochs+1):
     print('-' * 89)
     # Anneal the learning rate.
     if prev_val_loss and val_loss > prev_val_loss:
-        lr /= 4
+        lr = float(lr)/4.0
     prev_val_loss = val_loss
 
 
