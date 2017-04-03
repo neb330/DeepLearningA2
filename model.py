@@ -7,28 +7,33 @@ import numpy as np
 class RNNModel(nn.Module):
     """Container module with an encoder, a recurrent module, and a decoder."""
 
-    def __init__(self, rnn_type, ntoken, ninp, nhid, nlayers, dropout):
+    def __init__(self, rnn_type, ntoken, ninp, nhid, nlayers, dropout, initializer):
         super(RNNModel, self).__init__()
         self.encoder = nn.Embedding(ntoken, ninp)
         self.dropout = nn.Dropout(dropout)
         self.rnn = getattr(nn, rnn_type)(ninp, nhid, nlayers, bias=False, dropout=dropout)
         self.decoder = nn.Linear(nhid, ntoken)
-
+        self.initializer = initializer
         self.init_weights()
 
         self.rnn_type = rnn_type
         self.nhid = nhid
         self.nlayers = nlayers
+    
 
     def init_weights(self):
         initrange = 0.1
-        #init.kaiming_uniform(self.encoder.weight)
-        #init.kaiming_uniform(self.decoder.weight)
-        #init.xavier_uniform(self.encoder.weight, gain=np.sqrt(2.0))
-        #init.xavier_uniform(self.decoder.weight, gain=np.sqrt(2.0))
-        self.encoder.weight.data.uniform_(-initrange, initrange)
         self.decoder.bias.data.fill_(0)
-        self.decoder.weight.data.uniform_(-initrange, initrange)
+        if self.initializer == 'he':
+            init.kaiming_uniform(self.encoder.weight)
+            init.kaiming_uniform(self.decoder.weight)
+        elif self.initializer == 'xavier':
+            init.xavier_uniform(self.encoder.weight, gain=np.sqrt(2.0))
+            init.xavier_uniform(self.decoder.weight, gain=np.sqrt(2.0))
+        else:
+            self.encoder.weight.data.uniform_(-initrange, initrange)
+            self.decoder.weight.data.uniform_(-initrange, initrange)
+
 
     def forward(self, input, hidden):
         emb = self.dropout(self.encoder(input))

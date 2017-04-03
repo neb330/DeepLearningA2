@@ -18,6 +18,8 @@ parser.add_argument('--vocabsize', type=int, default=10000,
                     help='size of vocab -- only applicable when data = gutenberg')
 parser.add_argument('--optimizer', type=str, default=None,
                     help='options are adam, sgd')
+parser.add_argument('--init', type=str, default=None,
+                    help='options are xavier, he')
 parser.add_argument('--model', type=str, default='LSTM',
                     help='type of recurrent net (RNN_TANH, RNN_RELU, LSTM, GRU)')
 parser.add_argument('--dropout', type=float, default=1.0,
@@ -82,7 +84,7 @@ test_data = batchify(corpus.test, eval_batch_size)
 ###############################################################################
 
 ntokens = len(corpus.dictionary)
-model = model.RNNModel(args.model, ntokens, args.emsize, args.nhid, args.nlayers, args.dropout)
+model = model.RNNModel(args.model, ntokens, args.emsize, args.nhid, args.nlayers, args.dropout, args.init)
 if args.cuda:
     model.cuda()
 
