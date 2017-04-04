@@ -60,6 +60,7 @@ torch.manual_seed(args.seed)
 ###############################################################################
 
 if args.data == './data/gutenberg':
+    args.data += '_clean'
     dh.prepare_data(args.data, args.vocabsize)
 
 corpus = data.Corpus(args.data)
