@@ -13,6 +13,7 @@ arguments:
   --dropout         Dropout factor
   --optimizer       Can be one of {adam, sgd}
   --shuffle         True or False -- whether or not to shuffle data at the beginning of each epoch
+  --init            Can be one of {xavier, he}. Default None (random initialization)
 
 ```
 
